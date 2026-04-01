@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Tracker - Minimalist Pro (IndexedDB)</title>
+    <title>Finance Tracker - Minimalist Pro (IndexedDB) + Zakat Terpisah</title>
     <style>
         /* CSS INTERNAL UNTUK MODE OFFLINE */
         :root {
@@ -17,6 +17,9 @@
             --red: #dc2626;
             --emerald: #059669;
             --amber: #d97706;
+            --islamic-gold: #c9a03d;
+            --islamic-green: #2e7d32;
+            --islamic-dark: #1b3b1a;
         }
 
         * {
@@ -26,7 +29,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
+            background: linear-gradient(135deg, var(--bg) 0%, #e6e9f0 100%);
             color: var(--text-dark);
             margin: 0;
             padding-bottom: 40px;
@@ -50,9 +53,18 @@
             font-size: 20px;
             font-weight: 800;
             letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .logo span { color: var(--primary); }
+        .logo span { 
+            background: linear-gradient(135deg, var(--islamic-gold) 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
         .badge {
             font-size: 10px;
@@ -60,6 +72,7 @@
             padding: 4px 12px;
             border-radius: 999px;
             border: 1px solid #e2e8f0;
+            background: var(--white);
         }
 
         /* Card Styles */
@@ -72,17 +85,164 @@
             margin-bottom: 16px;
         }
 
-        .limit-card {
-            background: #0f172a;
+        /* Card Operasional */
+        .operational-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: var(--white);
             padding: 16px;
             border-radius: 16px;
             margin-bottom: 16px;
-            transition: background 0.5s ease;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .limit-card.danger { background: var(--red); }
-        .limit-card.safe { background: var(--emerald); }
+        .operational-card.danger { 
+            background: linear-gradient(135deg, var(--red) 0%, #b91c1c 100%);
+        }
+        .operational-card.safe { 
+            background: linear-gradient(135deg, var(--emerald) 0%, #047857 100%);
+        }
+
+        /* Card Zakat - Nuansa Islami */
+        .zakat-card {
+            background: linear-gradient(135deg, #1a3f2c 0%, #0d2e1a 100%);
+            color: var(--white);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(201, 160, 61, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .zakat-card::before {
+            content: "﷽";
+            font-family: serif;
+            font-size: 40px;
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            opacity: 0.1;
+            color: var(--islamic-gold);
+            pointer-events: none;
+        }
+        
+        .zakat-card::after {
+            content: "★";
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            color: var(--islamic-gold);
+            opacity: 0.3;
+            animation: shine 2s ease-in-out infinite;
+        }
+        
+        @keyframes shine {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+        
+        .zakat-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(201, 160, 61, 0.3);
+            padding-bottom: 8px;
+        }
+        
+        .zakat-header h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .zakat-icon {
+            font-size: 20px;
+            filter: drop-shadow(0 0 5px rgba(201,160,61,0.5));
+        }
+        
+        .zakat-amount-large {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--islamic-gold);
+            margin: 8px 0;
+            text-shadow: 0 0 10px rgba(201,160,61,0.3);
+        }
+        
+        .zakat-stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 12px 0;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            font-size: 10px;
+        }
+        
+        .zakat-stats div {
+            text-align: center;
+        }
+        
+        .zakat-stats .label {
+            opacity: 0.7;
+            font-size: 9px;
+        }
+        
+        .zakat-stats .value {
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .btn-zakat {
+            background: linear-gradient(135deg, var(--islamic-gold) 0%, #b8860b 100%);
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 8px;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .btn-zakat:active { transform: scale(0.98); }
+        .btn-zakat:disabled {
+            opacity: 0.5;
+            transform: none;
+        }
+        
+        .zakat-history-mini {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(201,160,61,0.3);
+            font-size: 9px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .history-chip {
+            background: rgba(201,160,61,0.2);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 8px;
+            color: var(--islamic-gold);
+        }
+        
+        .btn-link-gold {
+            background: none;
+            color: var(--islamic-gold);
+            font-size: 9px;
+            text-decoration: underline;
+            padding: 4px;
+        }
 
         .progress-container {
             width: 100%;
@@ -165,7 +325,7 @@
 
         .btn-primary {
             width: 100%;
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             font-weight: bold;
             padding: 12px;
@@ -287,12 +447,18 @@
             box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
         }
 
+        .modal-content-large {
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
         .hidden { display: none !important; }
 
         .text-green { color: var(--green); }
         .text-red { color: var(--red); }
         .text-primary { color: var(--primary); }
-        .text-amber { color: var(--amber); }
+        .text-gold { color: var(--islamic-gold); }
 
         /* Custom Scroll */
         .history-list::-webkit-scrollbar { width: 3px; }
@@ -324,21 +490,38 @@
                 opacity: 1;
             }
         }
-
-        /* Zakat info styling */
-        .zakat-info {
-            margin-top: 12px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            font-size: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        
+        .history-list-modal {
+            max-height: 300px;
+            overflow-y: auto;
         }
-
-        .zakat-amount {
+        
+        .history-record {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 11px;
+        }
+        
+        .history-record:last-child {
+            border-bottom: none;
+        }
+        
+        .history-date {
             font-weight: bold;
-            font-size: 12px;
+            color: var(--islamic-gold);
+        }
+        
+        .history-amount {
+            font-weight: bold;
+            color: var(--green);
+        }
+        
+        .doa-text {
+            font-size: 9px;
+            text-align: center;
+            margin-top: 8px;
+            font-style: italic;
+            opacity: 0.7;
         }
     </style>
 </head>
@@ -353,6 +536,15 @@
                 <button onclick="closePasswordModal()" style="flex:1; background:none; color:var(--text-slate); font-weight:bold;">Batal</button>
                 <button id="btnConfirmAction" style="flex:1; background:var(--primary); color:white; padding:10px; border-radius:8px; font-weight:bold;">Lanjut</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Riwayat Zakat -->
+    <div id="zakatHistoryModal" class="modal-overlay hidden">
+        <div class="modal-content modal-content-large">
+            <h3 style="text-align:center; margin-top:0;">📜 Riwayat Pembayaran Zakat</h3>
+            <div id="zakatHistoryList" class="history-list-modal" style="margin: 16px 0;"></div>
+            <button onclick="closeZakatHistoryModal()" style="width:100%; padding:10px; background:linear-gradient(135deg, var(--islamic-gold), #b8860b); color:white; border-radius:8px;">Tutup</button>
         </div>
     </div>
 
@@ -392,27 +584,71 @@
 
     <div class="container">
         <header>
-            <div class="logo"><span>ALFA</span></div>
+            <div class="logo"><span>✦</span> ALFA <span>✦</span></div>
             <div id="statusBadge" class="badge">
                 <span id="statusText">Status: Aman</span>
             </div>
         </header>
 
-        <!-- Limit Card dengan Zakat -->
-        <section id="limitCard" class="limit-card">
+        <!-- Card Operasional (Jatah Operasional 20%) -->
+        <section id="operationalCard" class="operational-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:10px; font-weight:bold; opacity:0.8; text-transform:uppercase;">Jatah Operasional (20%)</span>
+                <span style="font-size:10px; font-weight:bold; opacity:0.8; text-transform:uppercase;">📊 Jatah Operasional (20%)</span>
                 <span id="spendingLimit" style="font-size:14px; font-weight:bold;">Rp 0</span>
             </div>
             <div class="progress-container">
                 <div id="limitBar" class="progress-bar" style="width: 0%"></div>
             </div>
             <p id="limitWarning" style="font-size:9px; margin:4px 0 0 0; font-weight:bold; font-style:italic; color:#fecaca;"></p>
+            <div style="font-size:8px; margin-top:8px; opacity:0.6;">
+                <span>💰 Terpakai: <span id="operationalUsed">Rp 0</span> / <span id="operationalTotal">Rp 0</span></span>
+            </div>
+        </section>
+
+        <!-- Card Zakat - Nuansa Islami -->
+        <section class="zakat-card">
+            <div class="zakat-header">
+                <span class="zakat-icon">🕌</span>
+                <h3>ZAKAT MAL</h3>
+                <span class="zakat-icon">⭐</span>
+            </div>
             
-            <!-- Fitur Zakat 2.5% dari Laba -->
-            <div class="zakat-info">
-                <span>🕌 Zakat (2.5% dari Laba):</span>
-                <span id="zakatAmount" class="zakat-amount">Rp 0</span>
+            <div style="text-align: center;">
+                <div style="font-size: 10px; opacity: 0.7;">2.5% dari Laba Bersih</div>
+                <div id="zakatAmountLarge" class="zakat-amount-large">Rp 0</div>
+            </div>
+            
+            <div class="zakat-stats">
+                <div>
+                    <div class="label">Total Laba</div>
+                    <div class="value" id="totalProfitDisplay">Rp 0</div>
+                </div>
+                <div>
+                    <div class="label">Sudah Dizakati</div>
+                    <div class="value" id="totalZakatPaidProfit">Rp 0</div>
+                </div>
+                <div>
+                    <div class="label">Belum Dizakati</div>
+                    <div class="value" id="unpaidProfitDisplay">Rp 0</div>
+                </div>
+            </div>
+            
+            <div id="zakatStatusBadge" style="text-align: center; margin: 8px 0; padding: 4px; border-radius: 20px; background: rgba(0,0,0,0.3); font-size: 10px;">
+                <span id="zakatPaymentStatusText">Menunggu Pembayaran</span>
+            </div>
+            
+            <button id="payZakatBtn" class="btn-zakat" onclick="markZakatPaid()">
+                💰 BAYAR ZAKAT
+            </button>
+            
+            <!-- Preview Riwayat Zakat -->
+            <div id="zakatHistoryPreview" class="zakat-history-mini" style="display: none;">
+                <div style="display: flex; gap: 4px; flex-wrap: wrap;" id="zakatHistoryMiniList"></div>
+                <button id="viewAllHistoryBtn" class="btn-link-gold" onclick="showZakatHistoryModal()">Lihat Semua →</button>
+            </div>
+            
+            <div class="doa-text">
+                "Dan dirikanlah shalat, tunaikanlah zakat..." (QS. Al-Baqarah: 43)
             </div>
         </section>
 
@@ -452,7 +688,7 @@
                 <p id="liveAmountPreview" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); margin:0; font-size:10px; font-weight:bold; color:var(--primary); font-style:italic;"></p>
             </div>
 
-            <button onclick="addTransaction()" class="btn-primary">Simpan</button>
+            <button onclick="addTransaction()" class="btn-primary">Simpan Transaksi</button>
         </section>
 
         <!-- Filter & List -->
@@ -498,107 +734,170 @@
         let currentFilter = 'today';
         let pendingAction = null;
 
-        // Toast notification
-        function showToast(message, duration = 3000) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, duration);
+        // ==== ZAKAT MANAGEMENT =====
+        function getZakatHistory() {
+            const stored = localStorage.getItem('zakatPaymentHistory');
+            if (!stored) return [];
+            try {
+                return JSON.parse(stored);
+            } catch(e) {
+                return [];
+            }
         }
-
-        // Inisialisasi IndexedDB
+        
+        function saveZakatHistory(history) {
+            localStorage.setItem('zakatPaymentHistory', JSON.stringify(history));
+        }
+        
+        function getTotalProfit() {
+            let totalIncome = 0;
+            transactions.forEach(t => {
+                if (t.type === 'income') totalIncome += t.amount;
+            });
+            return totalIncome * 0.2;
+        }
+        
+        function getTotalProfitZakatPaid() {
+            const history = getZakatHistory();
+            let totalProfitZakatPaid = 0;
+            history.forEach(record => {
+                totalProfitZakatPaid += record.profitAtPayment;
+            });
+            return totalProfitZakatPaid;
+        }
+        
+        function getUnpaidProfit() {
+            const totalProfit = getTotalProfit();
+            const totalPaidProfit = getTotalProfitZakatPaid();
+            return Math.max(0, totalProfit - totalPaidProfit);
+        }
+        
+        function getCurrentZakatDue() {
+            const unpaidProfit = getUnpaidProfit();
+            return unpaidProfit * 0.025;
+        }
+        
+        function markZakatPaid() {
+            const zakatDue = getCurrentZakatDue();
+            if (zakatDue <= 0) {
+                showToast("✨ Tidak ada kewajiban zakat saat ini. Semua zakat sudah lunas.");
+                return;
+            }
+            
+            const unpaidProfit = getUnpaidProfit();
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            
+            if (confirm(`🕌 Bayar Zakat Mal\n\nBesaran Zakat: ${formatRupiah(zakatDue)}\nDari Laba: ${formatRupiah(unpaidProfit)}\n\n"Ambillah zakat dari harta mereka, guna membersihkan dan menyucikan mereka." (QS. At-Taubah: 103)\n\nLanjutkan pembayaran?`)) {
+                const history = getZakatHistory();
+                history.push({
+                    date: dateStr,
+                    profitAtPayment: unpaidProfit,
+                    zakatPaid: zakatDue
+                });
+                saveZakatHistory(history);
+                render();
+                showToast("✅ Alhamdulillah, zakat telah dibayar. Semoga Allah menerima amal ibadah kita.");
+            }
+        }
+        
+        function showZakatHistoryModal() {
+            const history = getZakatHistory();
+            const modal = document.getElementById('zakatHistoryModal');
+            const listContainer = document.getElementById('zakatHistoryList');
+            
+            if (history.length === 0) {
+                listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-slate);">Belum ada riwayat pembayaran zakat</div>';
+            } else {
+                let html = '';
+                history.slice().reverse().forEach((record) => {
+                    html += `
+                        <div class="history-record">
+                            <div><span class="history-date">📅 ${record.date}</span></div>
+                            <div>💰 Zakat dibayar: <span class="history-amount">${formatRupiah(record.zakatPaid)}</span></div>
+                            <div style="font-size:9px; color:var(--text-slate);">Dari laba: ${formatRupiah(record.profitAtPayment)}</div>
+                        </div>
+                    `;
+                });
+                listContainer.innerHTML = html;
+            }
+            
+            modal.classList.remove('hidden');
+        }
+        
+        function closeZakatHistoryModal() {
+            document.getElementById('zakatHistoryModal').classList.add('hidden');
+        }
+        
+        // ====== IndexedDB Functions ======
         function initDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
-                
                 request.onerror = () => reject(request.error);
                 request.onsuccess = () => {
                     db = request.result;
                     resolve(db);
                 };
-                
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
                     if (!db.objectStoreNames.contains(STORE_NAME)) {
-                        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                        store.createIndex('date', 'date', { unique: false });
-                        store.createIndex('type', 'type', { unique: false });
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
                     }
                 };
             });
         }
 
-        // Load semua transaksi dari IndexedDB
         async function loadTransactions() {
             return new Promise((resolve, reject) => {
                 const transaction = db.transaction([STORE_NAME], 'readonly');
                 const store = transaction.objectStore(STORE_NAME);
                 const request = store.getAll();
-                
                 request.onsuccess = () => {
                     transactions = request.result || [];
                     transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
                     resolve(transactions);
                 };
-                
                 request.onerror = () => reject(request.error);
             });
         }
 
-        // Simpan transaksi ke IndexedDB
         async function saveTransaction(transactionData) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction([STORE_NAME], 'readwrite');
                 const store = tx.objectStore(STORE_NAME);
                 const request = store.add(transactionData);
-                
                 request.onsuccess = () => resolve();
                 request.onerror = () => reject(request.error);
             });
         }
 
-        // Hapus transaksi dari IndexedDB
         async function deleteTransactionFromDB(id) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction([STORE_NAME], 'readwrite');
                 const store = tx.objectStore(STORE_NAME);
                 const request = store.delete(id);
-                
                 request.onsuccess = () => resolve();
                 request.onerror = () => reject(request.error);
             });
         }
 
-        // Hapus semua transaksi
         async function clearAllTransactions() {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction([STORE_NAME], 'readwrite');
                 const store = tx.objectStore(STORE_NAME);
                 const request = store.clear();
-                
                 request.onsuccess = () => resolve();
                 request.onerror = () => reject(request.error);
             });
         }
 
-        // Import banyak transaksi
         async function importTransactions(newTransactions) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction([STORE_NAME], 'readwrite');
                 const store = tx.objectStore(STORE_NAME);
-                
-                // Clear existing data
                 store.clear().onsuccess = () => {
-                    // Add all new transactions
-                    newTransactions.forEach(t => {
-                        store.add(t);
-                    });
+                    newTransactions.forEach(t => store.add(t));
                 };
-                
                 tx.oncomplete = () => resolve();
                 tx.onerror = () => reject(tx.error);
             });
@@ -612,23 +911,20 @@
             return `${year}-${month}-${day}`;
         }
 
-        // Init default dates
         document.getElementById('inputDate').value = getLocalDateString();
         document.getElementById('filterStartDate').value = getLocalDateString();
         document.getElementById('filterEndDate').value = getLocalDateString();
 
+        // Modal Password
         function openPasswordModal(actionCallback) {
             pendingAction = actionCallback;
             document.getElementById('passwordModal').classList.remove('hidden');
             document.getElementById('confirmPasswordInput').value = '';
-            document.getElementById('confirmPasswordInput').focus();
         }
-
         function closePasswordModal() {
             document.getElementById('passwordModal').classList.add('hidden');
             pendingAction = null;
         }
-
         document.getElementById('btnConfirmAction').addEventListener('click', () => {
             if (document.getElementById('confirmPasswordInput').value === APP_PASSWORD) {
                 const action = pendingAction;
@@ -640,48 +936,31 @@
             }
         });
 
+        // Add Transaction
         async function addTransaction() {
             const dateVal = document.getElementById('inputDate').value;
             const type = document.getElementById('type').value;
             let desc = document.getElementById('description').value.trim();
             const amount = getActualAmount(document.getElementById('amount').value);
-
             if (type === 'income' && !desc) desc = "Omset";
             if (type === 'expense' && !desc) { showToast("Deskripsi wajib diisi untuk Pengeluaran"); return; }
             if (!dateVal || amount <= 0) { showToast("Nominal tidak valid"); return; }
-
-            const newEntry = { 
-                id: Date.now(), 
-                date: dateVal, 
-                description: desc, 
-                amount: amount, 
-                type: type 
-            };
-            
+            const newEntry = { id: Date.now(), date: dateVal, description: desc, amount: amount, type: type };
             await saveTransaction(newEntry);
             await loadTransactions();
-            
             render();
-            
             document.getElementById('description').value = '';
             document.getElementById('amount').value = '';
             document.getElementById('liveAmountPreview').innerText = '';
             document.getElementById('inputDate').value = getLocalDateString();
-            
             showToast("Transaksi berhasil disimpan");
         }
 
         function changeFilter(filter) {
             currentFilter = filter;
-            
-            // Show/Hide Custom Selector
             const rangeSelector = document.getElementById('rangeSelector');
-            if (filter === 'range') {
-                rangeSelector.classList.remove('hidden');
-            } else {
-                rangeSelector.classList.add('hidden');
-            }
-
+            if (filter === 'range') rangeSelector.classList.remove('hidden');
+            else rangeSelector.classList.add('hidden');
             updateFilterUI();
             render();
         }
@@ -706,11 +985,12 @@
 
         async function requestClearAll() {
             openPasswordModal(async () => {
-                if(confirm("Hapus semua data?")) {
+                if(confirm("Hapus semua data? Ini juga akan mereset riwayat zakat.")) {
                     await clearAllTransactions();
+                    localStorage.removeItem('zakatPaymentHistory');
                     await loadTransactions();
                     render();
-                    showToast("Semua data dihapus");
+                    showToast("Semua data dihapus, riwayat zakat direset");
                 }
             });
         }
@@ -718,34 +998,24 @@
         function formatRupiah(num) {
             return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
         }
-
         function getActualAmount(rawValue) {
             if (!rawValue || isNaN(rawValue)) return 0;
             return parseFloat(rawValue) * 1000;
         }
-
         function handleSmartAmount(input) {
             const preview = document.getElementById('liveAmountPreview');
             if (!input.value) { preview.innerText = ""; return; }
             preview.innerText = formatRupiah(getActualAmount(input.value));
         }
-
         function updatePlaceholder() {
             const type = document.getElementById('type').value;
             document.getElementById('description').placeholder = type === 'expense' ? "Makan, Listrik, dll" : "Omset (jika kosong)";
-        }
-
-        // Fungsi untuk menghitung Zakat 2.5% dari Laba
-        function calculateZakat(profit) {
-            // Zakat 2.5% = 0.025
-            return profit * 0.025;
         }
 
         function render() {
             const list = document.getElementById('transactionList');
             const label = document.getElementById('currentPeriodLabel');
             list.innerHTML = '';
-            
             const nowStr = getLocalDateString();
             const startRange = document.getElementById('filterStartDate').value;
             const endRange = document.getElementById('filterEndDate').value;
@@ -753,9 +1023,7 @@
             const filtered = transactions.filter(t => {
                 if (currentFilter === 'today') return t.date === nowStr;
                 if (currentFilter === 'month') return t.date.startsWith(nowStr.substring(0, 7));
-                if (currentFilter === 'range') {
-                    return t.date >= startRange && t.date <= endRange;
-                }
+                if (currentFilter === 'range') return t.date >= startRange && t.date <= endRange;
                 return true;
             });
 
@@ -789,40 +1057,83 @@
                 list.appendChild(div);
             });
 
-            const profit = ti * 0.2;
-            const net = ti - te;
-            const remaining = profit - te;
-            const usage = profit > 0 ? (te / profit) * 100 : 0;
-            
-            // Hitung Zakat 2.5% dari Laba (profit)
-            const zakat = calculateZakat(profit);
-            
-            // Tampilkan Zakat di Limit Card
-            const zakatElement = document.getElementById('zakatAmount');
-            if (zakatElement) {
-                zakatElement.innerText = formatRupiah(zakat);
-            }
+            // Operational Card (berdasarkan filter)
+            const profitFiltered = ti * 0.2;
+            const netFiltered = ti - te;
+            const remaining = profitFiltered - te;
+            const usage = profitFiltered > 0 ? (te / profitFiltered) * 100 : 0;
 
             document.getElementById('totalIncome').innerText = formatRupiah(ti);
             document.getElementById('totalExpense').innerText = formatRupiah(te);
-            document.getElementById('autoProfit').innerText = formatRupiah(profit);
-            document.getElementById('netBalance').innerText = formatRupiah(net);
+            document.getElementById('autoProfit').innerText = formatRupiah(profitFiltered);
+            document.getElementById('netBalance').innerText = formatRupiah(netFiltered);
             document.getElementById('spendingLimit').innerText = formatRupiah(remaining);
             document.getElementById('limitBar').style.width = `${Math.min(usage, 100)}%`;
-
-            const card = document.getElementById('limitCard');
+            document.getElementById('operationalUsed').innerText = formatRupiah(te);
+            document.getElementById('operationalTotal').innerText = formatRupiah(profitFiltered);
+            
+            // ZAKAT (berdasarkan total keseluruhan)
+            const totalProfit = getTotalProfit();
+            const totalPaidProfit = getTotalProfitZakatPaid();
+            const unpaidProfit = getUnpaidProfit();
+            const zakatDue = getCurrentZakatDue();
+            
+            document.getElementById('zakatAmountLarge').innerHTML = formatRupiah(zakatDue);
+            document.getElementById('totalProfitDisplay').innerHTML = formatRupiah(totalProfit);
+            document.getElementById('totalZakatPaidProfit').innerHTML = formatRupiah(totalPaidProfit);
+            document.getElementById('unpaidProfitDisplay').innerHTML = formatRupiah(unpaidProfit);
+            
+            const statusSpan = document.getElementById('zakatPaymentStatusText');
+            const payBtn = document.getElementById('payZakatBtn');
+            
+            if (totalProfit <= 0) {
+                statusSpan.innerHTML = "📊 Belum Ada Laba";
+                statusSpan.style.color = "#fbbf24";
+                payBtn.disabled = true;
+                payBtn.style.opacity = "0.5";
+            } else if (zakatDue <= 0) {
+                statusSpan.innerHTML = "✓ Zakat Lunas | Alhamdulillah";
+                statusSpan.style.color = "#4ade80";
+                payBtn.disabled = true;
+                payBtn.style.opacity = "0.5";
+            } else {
+                statusSpan.innerHTML = `⚠️ Wajib Zakat ${formatRupiah(zakatDue)}`;
+                statusSpan.style.color = "#fbbf24";
+                payBtn.disabled = false;
+                payBtn.style.opacity = "1";
+            }
+            
+            // Preview Riwayat Zakat
+            const history = getZakatHistory();
+            const previewDiv = document.getElementById('zakatHistoryPreview');
+            const miniList = document.getElementById('zakatHistoryMiniList');
+            
+            if (history.length > 0) {
+                previewDiv.style.display = 'flex';
+                const latestHistory = history.slice(-3).reverse();
+                miniList.innerHTML = latestHistory.map(record => `
+                    <span class="history-chip">
+                        🕌 ${formatRupiah(record.zakatPaid)} (${record.date.substring(5,10)})
+                    </span>
+                `).join('');
+            } else {
+                previewDiv.style.display = 'none';
+            }
+            
+            // Operational Card Status
+            const opCard = document.getElementById('operationalCard');
             const warn = document.getElementById('limitWarning');
             const badge = document.getElementById('statusBadge');
-
-            if (te > profit && profit > 0) {
-                card.className = "limit-card danger";
-                warn.innerText = "OVER BUDGET! ( > 20% )";
+            
+            if (te > profitFiltered && profitFiltered > 0) {
+                opCard.className = "operational-card danger";
+                warn.innerText = "⚠️ OVER BUDGET! Pengeluaran melebihi 20% dari omset!";
                 badge.style.background = "#fef2f2";
                 badge.style.borderColor = "#fecaca";
                 badge.style.color = "#dc2626";
                 document.getElementById('statusText').innerText = "Status: Bahaya";
             } else {
-                card.className = ti > 0 ? "limit-card safe" : "limit-card";
+                opCard.className = ti > 0 ? "operational-card safe" : "operational-card";
                 warn.innerText = "";
                 badge.style.background = "#f0fdf4";
                 badge.style.borderColor = "#bbf7d0";
@@ -833,27 +1144,12 @@
 
         // Backup & Restore
         function openBackupModal() {
-            if (transactions.length === 0) {
-                showToast("Data masih kosong.");
-                return;
-            }
+            if (transactions.length === 0) { showToast("Data masih kosong."); return; }
             document.getElementById('backupOptionModal').classList.remove('hidden');
         }
-
-        function closeBackupModal() {
-            document.getElementById('backupOptionModal').classList.add('hidden');
-        }
-
-        function showImportModal() {
-            closeBackupModal();
-            document.getElementById('importModal').classList.remove('hidden');
-        }
-
-        function closeImportModal() {
-            document.getElementById('importModal').classList.add('hidden');
-            document.getElementById('importDataText').value = '';
-        }
-
+        function closeBackupModal() { document.getElementById('backupOptionModal').classList.add('hidden'); }
+        function showImportModal() { closeBackupModal(); document.getElementById('importModal').classList.remove('hidden'); }
+        function closeImportModal() { document.getElementById('importModal').classList.add('hidden'); document.getElementById('importDataText').value = ''; }
         function exportToFile() {
             const dataStr = JSON.stringify(transactions, null, 2);
             const blob = new Blob([dataStr], { type: 'application/json' });
@@ -866,14 +1162,12 @@
             closeBackupModal();
             showToast("File backup tersimpan");
         }
-
         function copyToClipboard() {
             const dataStr = JSON.stringify(transactions);
             navigator.clipboard.writeText(dataStr).then(() => {
                 showToast("Data berhasil disalin ke clipboard!");
                 closeBackupModal();
             }).catch(() => {
-                // Fallback untuk browser lama
                 const dummy = document.createElement("textarea");
                 document.body.appendChild(dummy);
                 dummy.value = dataStr;
@@ -884,59 +1178,35 @@
                 closeBackupModal();
             });
         }
-
         async function importFromText() {
             const raw = document.getElementById('importDataText').value.trim();
-            if (!raw) {
-                showToast("Data tidak boleh kosong");
-                return;
-            }
-            
+            if (!raw) { showToast("Data tidak boleh kosong"); return; }
             try {
                 const imported = JSON.parse(raw);
-                if (!Array.isArray(imported)) {
-                    showToast("Format data tidak valid");
-                    return;
-                }
-                
-                // Validasi struktur data
-                const isValid = imported.every(item => 
-                    item.id && 
-                    item.date && 
-                    item.description && 
-                    typeof item.amount === 'number' && 
-                    (item.type === 'income' || item.type === 'expense')
-                );
-                
-                if (!isValid) {
-                    showToast("Struktur data tidak valid");
-                    return;
-                }
-                
+                if (!Array.isArray(imported)) throw new Error();
+                const isValid = imported.every(item => item.id && item.date && item.description && typeof item.amount === 'number' && (item.type === 'income' || item.type === 'expense'));
+                if (!isValid) throw new Error();
                 await importTransactions(imported);
                 await loadTransactions();
                 render();
                 closeImportModal();
                 showToast(`Berhasil import ${imported.length} transaksi`);
-            } catch (e) {
-                showToast("Format JSON salah");
-            }
+            } catch (e) { showToast("Format JSON salah"); }
+        }
+        function showToast(message, duration = 3000) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), duration);
         }
 
-        // Initialize aplikasi
         async function initApp() {
-            try {
-                await initDB();
-                await loadTransactions();
-                render();
-                showToast("Aplikasi siap digunakan");
-            } catch (error) {
-                console.error('Failed to initialize:', error);
-                showToast("Gagal menginisialisasi database");
-            }
+            await initDB();
+            await loadTransactions();
+            render();
+            showToast("✨ Aplikasi siap digunakan | Jangan lupa tunaikan zakat ✨");
         }
-
-        // Start the app
         initApp();
     </script>
 </body>
